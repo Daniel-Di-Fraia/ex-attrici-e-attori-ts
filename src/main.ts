@@ -1,3 +1,4 @@
+//milestone 1
 type Person = {
   readonly id: number,
   readonly name: string,
@@ -6,7 +7,7 @@ type Person = {
   biography: string,
   image: string
 }
-
+//milestone 2
 type Actress = Person & {
   most_famous_movies: [string, string, string],
   awards: string,
@@ -15,8 +16,10 @@ type Actress = Person & {
   | "Spanish" | "South Korean" | "Chinese";
 }
 
+//milestone 3
 const url: string = 'http://localhost:3333';
 
+//(type guard)
 function isActress(data: unknown): data is Actress {
   if (typeof data !== 'object' || data === null) {
     return false;
@@ -47,7 +50,7 @@ async function getActress(id: number): Promise<Actress | null> {
       return null;
     }
 
-    const data = await response.json();
+    const data: unknown = await response.json();
 
     // Verifichiamo che il JSON ricevuto corrisponda al tipo Actress
     if (isActress(data)) {
@@ -70,6 +73,41 @@ getActress(1).then(actress => {
     console.log("Dati non validi o errore nella chiamata");
   }
 });
+
+//milestone 4
+async function getAllActresses(): Promise<Actress[]> {
+  try {
+    const response = await fetch(`${url}/actresses`);
+
+    if (!response.ok) {
+      //in caso di errore restituiamo un array vuoto
+      return [];
+    }
+
+    const data: unknown = await response.json();
+
+    // Verifichiamo che i dati siano un array
+    if (Array.isArray(data)) {
+      // Filtriamo gli elementi mantenendo solo quelli che superano il Type Guard
+      return data.filter(isActress);
+    }
+
+    return [];
+  } catch (error) {
+    console.error("Errore nel recupero della lista attrici:", error);
+    return [];
+  }
+}
+
+//test per vedere attrici
+getAllActresses().then(actresses => {
+  console.log(`Trovate ${actresses.length} attrici`);
+  if (actresses.length > 0) {
+    console.log(actresses);
+  }
+});
+
+
 
 
 
