@@ -107,6 +107,30 @@ getAllActresses().then(actresses => {
   }
 });
 
+//milestone 5
+async function getActresses(ids: number[]): Promise<(Actress | null)[]> {
+ 
+  const actressPromises = ids.map(id => getActress(id));
+
+  //Promise.all per attendere che tutte le chiamate finiscano in parallelo
+  const results = await Promise.all(actressPromises);
+
+  return results;
+}
+
+//test
+getActresses([1, 2, 999]).then(results => {
+  console.log("Risultati recuperati in parallelo:");
+  results.forEach((res, index) => {
+    if (res) {
+      console.log(`ID richiesto [${index}]: Trovata ${res.name}`);
+    } else {
+      console.log(`ID richiesto [${index}]: Non trovata (null)`);
+    }
+  });
+});
+
+
 
 
 
