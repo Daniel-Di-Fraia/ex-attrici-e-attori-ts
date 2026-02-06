@@ -7,10 +7,69 @@ type Person = {
   image: string
 }
 
-type actress = Person & {
+type Actress = Person & {
   most_famous_movies: [string, string, string],
   awards: string,
   nationality: "American" | "British" | "Australian" | "Israeli-American" 
   | "South African" | "French" | "Indian" | "Israeli" 
   | "Spanish" | "South Korean" | "Chinese";
 }
+
+const url: string = 'http://localhost:3333';
+
+function isActress(data: unknown): data is Actress {
+  if (typeof data !== 'object' || data === null) {
+    return false;
+  }
+
+  const d = data as Actress;
+
+  const nationalities = ["American", "British", "Australian", "Israeli-American", "South African", "French", "Indian", "Israeli", "Spanish", "South Korean", "Chinese"];
+
+  return (
+    typeof d.id === 'number' &&
+    typeof d.name === 'string' &&
+    typeof d.birth_year === 'number' &&
+    typeof d.biography === 'string' &&
+    typeof d.image === 'string' &&
+    typeof d.awards === 'string' &&
+    Array.isArray(d.most_famous_movies) && d.most_famous_movies.length === 3 &&
+    nationalities.includes(d.nationality)
+  );
+}
+
+async function getActress(id: number): Promise<Actress | null> {
+  try {
+    const response = await fetch(`${url}/actresses/${id}`);
+
+    //controlliamo la proprietà .ok
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json();
+
+    // Verifichiamo che il JSON ricevuto corrisponda al tipo Actress
+    if (isActress(data)) {
+      return data;
+    }
+
+    return null;
+  } catch (error) {
+    // In caso di errore
+    console.error("Errore nel recupero dell'attrice:", error);
+    return null;
+  }
+}
+
+//Chiamata per il test
+getActress(1).then(actress => {
+  if (actress) {
+    console.log("Dati validi:", actress);
+  } else {
+    console.log("Dati non validi o errore nella chiamata");
+  }
+});
+
+
+
